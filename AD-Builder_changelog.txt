@@ -1,0 +1,42 @@
+==============================================================================================
+AD-Builder
+
+Change log
+==============================================================================================
+==============================================================================================
+
+
+v20090331.1300
+--------------------
+ .) Updated sample input file.
+ .) Commands are now processed in groups, following this order: OU (with ProtectOU), Group, CreateGPO, LinkGPO, Perm.
+ .) Output now looks different (commands processed in groups, lines with possibly wrong syntax listed first).
+ .) Script now exits with an error when lines with possibly wrong syntax exist.
+
+
+v20090330.1700
+--------------------
+ .) Adding security is now tried 3 times before exiting with an error.
+ ..) There is a delay of 10 seconds between the 1st and 2nd retry; 15 seconds between the 2nd and 3rd.
+ .) Solved a bug where only parts of the output of an external program has been captured.
+ .) When a GPO already exists, a PROBLEM is logged instead of an ERROR.
+
+
+v20090323.2100
+--------------------
+ .) Added check for needed 3rd part files.
+ .) Added check if GPO is already linked to an OU.
+ .) Added check for GPMC.
+ .) Solved a with the creation of OUs, where text in the description filed was replace incorrectly.
+
+
+v20090322.0100
+--------------------
+ .) Added "linkgpo".
+ .) Added "creategpo".
+ .) Updated sample input file.
+
+
+v20090321.0030
+--------------------
+ .) Initial release.

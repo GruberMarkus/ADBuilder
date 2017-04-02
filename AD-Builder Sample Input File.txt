@@ -1,0 +1,99 @@
+' ==============================================================================================
+' AD-Builder v20090331.1300
+' Usage information for input file
+' ==============================================================================================
+' 
+' Script must be run using cscript.exe.
+' 
+' User must have appropriate rights in Active Directory.
+' 
+' User and workstation/server must be in the domain where changes shall be applied.
+'
+' The script should be run on a Domain Controller for performance reasons.
+' 
+' The scripts only adds, it does not delete or overwrite anything.
+' Exception are permissions, if configured accordingly in the input file.
+' 
+' Valid prefixes are:
+' 	"ou: "
+' 	"group: "
+' 	"perm: "
+'	"protectou: "
+'	"creategpo: "
+'	"linkgpo: "
+' Everything else is treated as possibly wrong syntax.
+'
+' Commands are processed in groups, follwing this order: OU (with ProtectOU), Group, CreateGPO, LinkGPO, Perm.
+'
+' Comments should start with "'" (as this line does). Comment lines do not appear in the log.
+'
+' A comment must be on a single line. In-Line comments are not allowed.
+' 
+' You can use blanks and tabs for easier reading.
+' 
+' Lower case and uppercase is ignored for prefixes and variable names, but not for anything else.
+'
+' Variables must be included between $-signs and must start with the string "Var".
+' Example: $VarLastname$
+'
+' Format of prefix "ou: " is identical to "dsadd ou" with one exception: Distinguished names
+' are not allowed, use OU1\OU2\OU3 instead.
+'	ou: OU1\OU2
+'	ou: OU1\OU2\OU3 -desc "description"
+'
+' Format of prefix "group: "
+'	group: <name of group> -scope (l|g|u) -desc "<description>"
+' 	group: <name of group>
+'
+' Format of prefix "perm: "
+' 	perm: /g name of group:rights /i:inheritance
+'	perm: /g grp02:ccdc;group; /i:t
+'
+' Sometimes, AD is busy and "perm: " fails. Therefore, the script tries to set permissions
+' three times with a 10 second delay between the 1st and 2nd try and a
+' 15 second delay between the 2nd and 3rd try.
+'
+' The prefix "protectou: " is a switch that can be turned on and off during runtime.
+'	protectou: yes
+'	protectou: no
+' Possible values are "on" and "off". Default is "off".
+'
+' Protection sets the following permissions:
+'	OU: "deny delete" and "deny delete subtree" for "everyone" (dsacls <DN of OU> /d S-1-1-0:SDDT)
+'	Parent OU: "deny delete all child objects" for "everyone" (dsacls <DN of OU> /d S-1-1-0:DC)
+'
+' Format of prefix "linkgpo: "
+' 	linkgpo: name of policy
+'	linkgpo: default domain policy
+'
+' Format of prefix "creategpo: "
+' 	linkgpo: name of policy
+'	linkgpo: New Policy
+' "creategpo" requires GPMC installed.
+'
+' Starting point for OUs is always the root of the domain. Parent OUs must exit.
+'
+' Permissions are always applied at the OU level.
+'
+' The script uses the following external programs:
+'	dsadd.exe
+'	dsacls.exe
+'
+' =============================================================================================='
+
+protectou: on
+
+ou: $VarFirstLevelOU$ -desc Test-Beschreibung$
+
+	ou: $VarFirstLevelOU$\ou2 -desc "Beschreibung mit Sonderzeichen $$$$"
+		creategpo: gpo.$VarFirstLevelOU$.ou2
+		linkGPO: gpo.$VarFirstLevelOU$.OU2
+		group: grp02 -scope l -desc "lkj"
+		perm: /g grp02:ccdc;group; /i:t
+
+	ou: $VarFirstLevelOU$\ou1
+		group: grp01
+		perm: /g grp01:ccdc;group; /i:t
+
+'for testing purposes
+x: yyy
